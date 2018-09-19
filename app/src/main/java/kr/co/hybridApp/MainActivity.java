@@ -50,7 +50,7 @@ import kr.co.hybridApp.settings.MyWebChromeClient;
 import kr.co.hybridApp.util.SystemUtil;
 
 /**
- * 애플리케이션 메인 웹뷰 초기화면
+ * 애플리케이션 메인 웹뷰 초기화면...
  * 개발환경 : Android 5.1 ~ 7.0
  * 테스트 디바이스 : Samsung Galaxy S4 (Android 5.0.1) ~ S7 (Android 7.0)
  */
