@@ -2,7 +2,6 @@ package kr.co.hybridApp;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -10,18 +9,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.webkit.CookieManager;
@@ -30,7 +24,6 @@ import android.webkit.DownloadListener;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.webkit.DownloadListener;
 import android.widget.Toast;
 import android.app.DownloadManager;
 import android.app.DownloadManager.Request;
@@ -43,6 +36,7 @@ import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import kr.co.hybridApp.receiver.DownloadReceiver;
 import kr.co.hybridApp.util.CPreferences;
 import kr.co.hybridApp.settings.WebViewSetting;
 import kr.co.hybridApp.settings.MyWebViewClient;
@@ -56,13 +50,14 @@ import kr.co.hybridApp.util.SystemUtil;
  */
 
 @SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
     public final int REQUEST_CODE = 0;
 
-    private final String BASE_URL = "https://www.flagone.co.kr/";
-    //private final String BASE_URL = "http://10.59.35.70/";
+    //private final String BASE_URL = "https://www.flagone.co.kr/";
+    private final String BASE_URL = "http://localhost:8080/";
 
-    private final String MAIN_URL = "mobile/mobileMain.do";
+    private final String MAIN_URL = "/admin/main/main.do";
+    private final String LOGIN_URL = "admin/login.do";
     private final String TAG = "MainActivity";
     private String activityName = "MainActivity";
     private String APP_VERSION = "";
@@ -71,18 +66,9 @@ public class MainActivity extends Activity {
     private boolean isSecond = false;  // 하드웨어 Back Key를 두번 눌렀는지 체크
     private Timer timer; //하드웨어 Back Key를 두번 누르는 사이에 2초가 지났는지 체크
 
-    public Uri mImageCaptureUri = null;
-    public String elementId = null;
-    public final int PICK_FROM_GALLERY = 90001;
-    public final int PICK_FROM_CAMERA = 90002;
-    public final int CROP_FROM_CAMERA = 90003;
-
-    public String callBase64ImageString = "";
     private String url = null;
     private boolean mFlag = false;
-
-    private DownloadManager mgr=null;
-    private long lastDownload=-1L;
+    private DownloadReceiver mOnComplete = new DownloadReceiver();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,12 +76,6 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         Log.d(">>> 1 MainActivity onCreate ", "onCreate");
         context = this;
-
-        mgr=(DownloadManager)getSystemService(DOWNLOAD_SERVICE);
-        registerReceiver(onComplete,
-                new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-        registerReceiver(onNotificationClick,
-                new IntentFilter(DownloadManager.ACTION_NOTIFICATION_CLICKED));
 
         // 앱 루팅 체크로직
         if(isRooted()){
@@ -274,6 +254,8 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
 
+        // 다운로드 리시버 풀기
+        unregisterReceiver(mOnComplete);
         // 웹뷰 캐쉬 정리
         webViewClearCache();
 
@@ -609,8 +591,6 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void downloadVideo(final String url) {
-            //webview.loadUrl(url,WebViewSetting.setHeader(context));
-
             DownloadManager mdDownloadManager = (DownloadManager) context
                     .getSystemService(Context.DOWNLOAD_SERVICE);
             DownloadManager.Request req = new DownloadManager.Request(
@@ -622,19 +602,22 @@ public class MainActivity extends Activity {
             req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
             req.setDestinationUri(Uri.fromFile(destinationFile));
             mdDownloadManager.enqueue(req);
+
+            registerReceiver(mOnComplete, new IntentFilter(
+                    DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+
+
+
         }
     }
 
-    BroadcastReceiver onComplete=new BroadcastReceiver() {
-        public void onReceive(Context ctxt, Intent intent) {
+    //BroadcastReceiver onComplete=new BroadcastReceiver() {
+    //    public void onReceive(Context ctxt, Intent intent) {
             //findViewById(R.id.start).setEnabled(true);
-        }
-    };
+    //        Toast.makeText(context, "파일다운로드를 완료하였습니다.", Toast.LENGTH_LONG).show();
+    //    }
+    //};
 
-    BroadcastReceiver onNotificationClick=new BroadcastReceiver() {
-        public void onReceive(Context ctxt, Intent intent) {
-            Toast.makeText(ctxt, "Ummmm...hi!", Toast.LENGTH_LONG).show();
-        }
-    };
+
 
 }

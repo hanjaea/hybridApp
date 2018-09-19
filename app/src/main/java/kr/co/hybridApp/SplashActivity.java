@@ -11,6 +11,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v7.app.AppCompatActivity;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import org.json.JSONObject;
@@ -21,7 +22,7 @@ import kr.co.hybridApp.util.HttpConnectionUtil;
  * 인트로 액티비티 개발환경 : Android 5.1 테스트 디바이스 : Samsung Galaxy S4 (Android 5.0.1)
  * 
  */
-public class SplashActivity extends Activity {
+public class SplashActivity extends AppCompatActivity {
 
 	private final String BASE_URL = "https://www.atxpert-bus.co.kr/";
 	//private final String BASE_URL = "http://192.168.20.85:8081/";

@@ -4,9 +4,11 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -23,6 +25,7 @@ import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -39,6 +42,7 @@ import java.net.HttpURLConnection;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import kr.co.hybridApp.receiver.DownloadReceiver;
 import kr.co.hybridApp.settings.MyWebChromeClient;
 import kr.co.hybridApp.settings.MyWebViewClient;
 import kr.co.hybridApp.settings.WebViewSetting;
@@ -52,7 +56,7 @@ import kr.co.hybridApp.util.SystemUtil;
  */
 
 @SuppressLint({"SetJavaScriptEnabled", "JavascriptInterface"})
-public class DetailActivity extends Activity {
+public class DetailActivity extends AppCompatActivity {
     public final int REQUEST_CODE = 0;
 
     private final String BASE_URL = "https://www.flagone.co.kr/";
@@ -66,6 +70,7 @@ public class DetailActivity extends Activity {
     private Context context;
     private boolean isSecond = false;  // 하드웨어 Back Key를 두번 눌렀는지 체크
     private Timer timer; //하드웨어 Back Key를 두번 누르는 사이에 2초가 지났는지 체크
+    private DownloadReceiver mOnComplete = new DownloadReceiver();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,6 +129,7 @@ public class DetailActivity extends Activity {
     protected void onDestroy() {
         super.onDestroy();
 
+        unregisterReceiver(mOnComplete);
         // 웹뷰 캐쉬 정리
         webViewClearCache();
 
@@ -355,8 +361,6 @@ public class DetailActivity extends Activity {
 
         @JavascriptInterface
         public void downloadVideo(final String url) {
-            //webview.loadUrl(url,WebViewSetting.setHeader(context));
-
             DownloadManager mdDownloadManager = (DownloadManager) context
                     .getSystemService(Context.DOWNLOAD_SERVICE);
             DownloadManager.Request req = new DownloadManager.Request(
@@ -368,7 +372,17 @@ public class DetailActivity extends Activity {
             req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
             req.setDestinationUri(Uri.fromFile(destinationFile));
             mdDownloadManager.enqueue(req);
+
+            registerReceiver(mOnComplete, new IntentFilter(
+                    DownloadManager.ACTION_DOWNLOAD_COMPLETE));
         }
 
     }
+
+    //BroadcastReceiver onComplete=new BroadcastReceiver() {
+    //    public void onReceive(Context ctxt, Intent intent) {
+            //findViewById(R.id.start).setEnabled(true);
+    //        Toast.makeText(context, "파일다운로드를 완료하였습니다.", Toast.LENGTH_LONG).show();
+    //    }
+    //};
 }
