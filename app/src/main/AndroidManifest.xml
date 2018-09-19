@@ -45,6 +45,13 @@
             android:label="@string/app_name"
             android:screenOrientation="portrait" />
 
+        <receiver android:name=".receiver.DownloadReceiver">
+            <intent-filter>
+                <action android:name="kr.co.hybridApp.SEND_BROAD_CAST"/>
+            </intent-filter>
+        </receiver>
+
+
         <!-- firebase를 이용한 푸시서비스 이용시 상위 버젼의 경우 channel id 정의 meta-data -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
@@ -74,7 +81,6 @@
             android:name="com.google.firebase.messaging.default_notification_icon"
             android:resource="@drawable/push" />
 
-        <activity android:name=".DownloadActivity"></activity>
     </application>
 
 </manifest>
