@@ -4,9 +4,11 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -79,12 +81,21 @@ public class MainActivity extends Activity {
     private String url = null;
     private boolean mFlag = false;
 
+    private DownloadManager mgr=null;
+    private long lastDownload=-1L;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(">>> 1 MainActivity onCreate ", "onCreate");
         context = this;
+
+        mgr=(DownloadManager)getSystemService(DOWNLOAD_SERVICE);
+        registerReceiver(onComplete,
+                new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        registerReceiver(onNotificationClick,
+                new IntentFilter(DownloadManager.ACTION_NOTIFICATION_CLICKED));
 
         // 앱 루팅 체크로직
         if(isRooted()){
@@ -613,5 +624,17 @@ public class MainActivity extends Activity {
             mdDownloadManager.enqueue(req);
         }
     }
+
+    BroadcastReceiver onComplete=new BroadcastReceiver() {
+        public void onReceive(Context ctxt, Intent intent) {
+            //findViewById(R.id.start).setEnabled(true);
+        }
+    };
+
+    BroadcastReceiver onNotificationClick=new BroadcastReceiver() {
+        public void onReceive(Context ctxt, Intent intent) {
+            Toast.makeText(ctxt, "Ummmm...hi!", Toast.LENGTH_LONG).show();
+        }
+    };
 
 }
