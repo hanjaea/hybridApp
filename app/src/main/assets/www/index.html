@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0" />
+    <style>
+      body,.top-bar{margin-top:1.9em}
+    </style>
+    <!-- MobileDesk -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="./common-interface.js"></script>
+
+</head>
+<body bgcolor="white" style="height:760px" >
+<script type="text/javascript">
+
+    // 사용자 정의 저장 데이터 사용시 사용
+    function getVariable(key) {
+         interface.getVariable(key,function(value){
+             document.getElementById('result').innerHTML = value;
+         });
+
+	}
+
+    // 사용자 정의 저장 데이터 저장 시 사용(사용자가 key, value 값을 주어서 필요 시 해당 key롤 저장 된 값을 언제든 사용 가능 합니다.)
+	function setVariable(key,value){
+		interface.setVariable(key,value);
+	    alert('setData key : '+key +'  value : '+ value);
+	}
+
+	function getTokenId(){
+	    interface.getTokenId(function(value){
+            document.getElementById('result').innerHTML = value;
+	    });
+	}
+
+	function getAppVersion(){
+	    interface.getAppVersion(function(value){
+            document.getElementById('result').innerHTML = value;
+	    });
+	}
+    function getAppModel(){
+	    interface.getAppModel(function(value){
+            document.getElementById('result').innerHTML = value;
+	    });
+	}
+	function callOutBrowser(url){
+        interface.callOutBrowser(url);
+    }
+    function callAnotherView(url){
+        interface.callAnotherView(url);
+    }
+    /*
+    function getCamera(){
+        interface.getCamera(function(value){
+            document.getElementById('result').innerHTML = value;
+	    });
+    }
+    */
+
+    function downloadVideo(url){
+            interface.downloadVideo(url,function(value){
+                                    document.getElementById('result').innerHTML = value;
+                                    });
+           //location.href= url
+     }
+
+    function link(url){
+        alert('url :' + url);
+        interface.setWebviewUrl(url);
+    }
+
+    $(document).ready(function() {
+
+
+    });
+</script>
+
+
+
+
+<fieldset>
+    <legend> hybrid app web interface</legend>
+    <p><label>key: <input type="text" id= "key" name="key" placeholder="key" value="key"></label></p>
+    <p><label>value: <input type="text" id="val" name="val" placeholder="value" value="value"></label></p>
+    <p><label>getData: <input type="button" value="getData" onclick="javascript:getVariable(document.getElementById('key').value);" /></label></p>
+    <p><label>setData: <input type="button" value="setData" onclick="javascript:setVariable(document.getElementById('key').value, document.getElementById('val').value);" style="left:50%;"/></label></p>
+    <hr>
+    <p><label>버전 호출: <input type="button" value="버전" onclick="javascript:getAppVersion();"/></label></p>
+    <p><label>모델 호출: <input type="button" value="버전" onclick="javascript:getAppModel();"/></label></p>
+    <p><label>토큰 호출: <input type="button" value="getTokenId" onclick="javascript:getTokenId();"/></label></p>
+    <!--<p><label>카메라 호출: <input type="button" value="getCamera" onclick="javascript:getCamera();"/></label></p>-->
+    <p><label>외부브라우져링크:<input type="button" value="callOutBrowser" onclick="javascript:callOutBrowser('https://m.naver.com');" /></label></p>
+    <!--<p><label>DatePicker: <input type="date" id="datepicker"/></label></p>-->
+    <p><label>Detail: <input type="button" value="상세화면이동" id="detail" onclick="javascript:callAnotherView('https://m.daum.net/');"/></label></p>
+    <p><label>다운로드 테스트 <input type="button" value="다운로드" id="download" onclick="javascript:download('https://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_1mb.mp4');"/></label></p>
+    <p><label>다운로드 테스트2 <input type="button" value="다운로드2" id="download2" onclick="javascript:download('http://techslides.com/demos/sample-videos/small.mp4');"/></label></p>
+    <p><label>다운로드 테스트3 <input type="button" value="지구" id="download3" onclick="javascript:download('http://file-examples.com/wp-content/uploads/2017/04/file_example_MP4_480_1_5MG.mp4');"/></label></p>
+
+
+    <p><label>동영상 다운로드:<input type="button" value="downloadVideo"
+                              onclick="javascript:downloadVideo('https://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_20mb.mp4');" /></label></p>
+
+</fieldset>
+
+<br/>
+<br/>
+
+<fieldset>
+    <legend>hybrid interface result</legend>
+    <p><span id="result"/></p>
+</fieldset>
+<!--<fieldset>-->
+    <!--<legend>base64 image</legend>-->
+    <!--<p><img id="img"></p>-->
+<!--</fieldset>-->
+
+</div>
+</body>
+</html>
