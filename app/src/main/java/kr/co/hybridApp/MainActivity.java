@@ -1,9 +1,8 @@
-package kr.co.hybridApp;
+package kr.co.hybridapp;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -26,22 +25,19 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
 import android.app.DownloadManager;
-import android.app.DownloadManager.Request;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.HttpURLConnection;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import kr.co.hybridApp.receiver.DownloadReceiver;
-import kr.co.hybridApp.util.CPreferences;
-import kr.co.hybridApp.settings.WebViewSetting;
-import kr.co.hybridApp.settings.MyWebViewClient;
-import kr.co.hybridApp.settings.MyWebChromeClient;
-import kr.co.hybridApp.util.SystemUtil;
+import kr.co.hybridapp.receiver.DownloadReceiver;
+import kr.co.hybridapp.util.CPreferences;
+import kr.co.hybridapp.settings.WebViewSetting;
+import kr.co.hybridapp.settings.MyWebViewClient;
+import kr.co.hybridapp.settings.MyWebChromeClient;
+import kr.co.hybridapp.util.SystemUtil;
+import kr.co.hybridapp.util.URLConstants;
 
 /**
  * 애플리케이션 메인 웹뷰 초기화면...
@@ -53,11 +49,6 @@ import kr.co.hybridApp.util.SystemUtil;
 public class MainActivity extends AppCompatActivity {
     public final int REQUEST_CODE = 0;
 
-    //private final String BASE_URL = "https://www.flagone.co.kr/";
-    private final String BASE_URL = "http://localhost:8080/";
-
-    private final String MAIN_URL = "/admin/main/main.do";
-    private final String LOGIN_URL = "admin/login.do";
     private final String TAG = "MainActivity";
     private String activityName = "MainActivity";
     private String APP_VERSION = "";
@@ -69,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private String url = null;
     private boolean mFlag = false;
     private DownloadReceiver mOnComplete = new DownloadReceiver();
+    private String URL_DOMAIN = URLConstants.URL_DOMAIN;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -103,8 +95,15 @@ public class MainActivity extends AppCompatActivity {
 
             return;
         }
-
         isStoragePermissionGranted();
+        /*
+        if(!isStoragePermissionGranted()){
+            moveTaskToBack(true);
+            CPreferences.setPreferences(context,"IsFirst","false");
+            finish();
+            android.os.Process.killProcess(android.os.Process.myPid());
+        }
+        */
 
         Log.d(">>>> isStoragePermissionGranted", String.valueOf(mFlag));
 
@@ -146,6 +145,9 @@ public class MainActivity extends AppCompatActivity {
      * onResume에서 호출될 함수를 별도 함수로 만들어 퍼미션 체크 후 호출 할 수 있도록 하였다.
      */
     private void funcResume(){
+        String AUTO_LOGIN_TOKEN = CPreferences.getPreferences(context,"AUTO_LOGIN_TOKEN");
+        Log.d(">>>  onResume AUTO_LOGIN_TOKEN ", AUTO_LOGIN_TOKEN);
+
         if(mFlag) {
             Bundle extras = getIntent().getExtras();
             Log.d(">>> 1 MainActivity onResume ", "onResume");
@@ -154,7 +156,11 @@ public class MainActivity extends AppCompatActivity {
                 if (extras.containsKey("url")) {
                     url = extras.getString("url");
                 } else {
-                    url = null;
+                    if(CPreferences.getPreferences(context,"url") != null ){
+                        url = CPreferences.getPreferences(context,"url");
+                    }else {
+                        url = null;
+                    }
                 }
             }
             //url = getIntent().getData().getString("url");
@@ -167,21 +173,21 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(">>> 2 MainActivity URL", url);
                 //webview.loadUrl(BASE_URL + subUrl, WebViewSetting.setHeader(context)); //메인페이지 로드
                 //webview.loadUrl("file:///android_asset/www/index.html", WebViewSetting.setHeader(context));
-                //webview.loadUrl(url, WebViewSetting.setHeader(context));
-
-                // 푸시로 상세화면 접근 시 리스트화면 접근 시 인트로 화면보여지는 것을 막는다
-                //CPreferences.setPreferences(context, "isVisit", "true");
-
-                //Intent intent = new Intent(context, MainActivity.class);
-                Intent intent = new Intent(context, DetailActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-                intent.putExtra("url", url);
-                startActivity(intent);
+                if(url == null || url.isEmpty()){
+                    if(CPreferences.getPreferences(context, "AUTO_LOGIN_TOKEN") != null && !CPreferences.getPreferences(context, "AUTO_LOGIN_TOKEN").isEmpty()){
+                        webview.loadUrl(URL_DOMAIN + URLConstants.MAIN_URL, WebViewSetting.setHeader(context)); //메인페이지
+                    }else{
+                        webview.loadUrl(URL_DOMAIN + URLConstants.LOGIN_URL, WebViewSetting.setHeader(context)); //로그인페이지
+                    }
+                }else {
+                    webview.loadUrl(url, WebViewSetting.setHeader(context));
+                }
 
                 CPreferences.setPreferences(context, "url", "");
                 //CPreferences.setPreferences(context, "isPushClick", "false");
                 getIntent().removeExtra("url");
                 url = null;
+
             }
         }
     }
@@ -242,6 +248,10 @@ public class MainActivity extends AppCompatActivity {
         **/
         funcResume();
 
+
+        String tokenId = CPreferences.getPreferences(context,"tokenId");
+        Log.d(">>>> tokenId : ", tokenId);
+
     }
 
     @Override
@@ -272,6 +282,7 @@ public class MainActivity extends AppCompatActivity {
      */
     @SuppressWarnings("deprecation")
     public void initWebView() {
+        Log.d(">>>> ","initWebView()");
 
         webview = (WebView) findViewById(R.id.webview);
         WebSettings webSettings = webview.getSettings();
@@ -354,17 +365,18 @@ public class MainActivity extends AppCompatActivity {
         webview.setWebViewClient(new MyWebViewClient(context, activityName));       // WebViewClient (front 에서 오고가는 http url 을 인터셉터 하여 네이티브에서 가공처리 할 수 있다)
         webview.setWebChromeClient(new MyWebChromeClient(context));                 // WebChromeClient (javascript alert, dialog 를 네이티브 다이얼로그 방식으로 표현해 준다.)
 
-
-        String subUrl = MAIN_URL;
         Bundle extras = getIntent().getExtras();
 
-        // Intent를 통해 Bundle 값이 있을 경우 해당 주소로 이동
-        //if(extras != null){
-        //    CPreferences.setPreferences(context,"isPushClick","false");
-        //}
+        Log.d(">>> AUTO_LOGIN_TOKEN : ", CPreferences.getPreferences(context, "AUTO_LOGIN_TOKEN"));
+        Log.d(">>> AUTO_LOGIN_TOKEN value of : ", String.valueOf(CPreferences.getPreferences(context, "AUTO_LOGIN_TOKEN").isEmpty()));
 
-        //webview.loadUrl(BASE_URL + subUrl, WebViewSetting.setHeader(context)); //메인페이지 로드
-        webview.loadUrl("file:///android_asset/www/index.html", WebViewSetting.setHeader(context));
+        // Intent를 통해 Bundle 값이 있을 경우 해당 주소로 이동
+        if(CPreferences.getPreferences(context, "AUTO_LOGIN_TOKEN") != null && !CPreferences.getPreferences(context, "AUTO_LOGIN_TOKEN").isEmpty()){
+            webview.loadUrl(URL_DOMAIN + URLConstants.MAIN_URL, WebViewSetting.setHeader(context)); //메인페이지
+        }else{
+            webview.loadUrl(URL_DOMAIN + URLConstants.LOGIN_URL, WebViewSetting.setHeader(context)); //로그인페이지
+        }
+        //webview.loadUrl("file:///android_asset/www/index.html", WebViewSetting.setHeader(context));
         //webview.loadUrl("http://code.google.com/p/gcm/source/browse/");
         //webview.loadUrl("https://www.sample-videos.com/");
 
@@ -379,7 +391,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean onKeyDown(int keyCode, KeyEvent event) {
         if ((keyCode == KeyEvent.KEYCODE_BACK)) {
 
-            if (webview.canGoBack() && !webview.getUrl().contains("/mobileMain/")) {
+            if (webview.canGoBack() && !webview.getUrl().contains("/mobile/main/")) {
                 webview.goBack();
                 return true;
             }
@@ -448,9 +460,7 @@ public class MainActivity extends AppCompatActivity {
      *
      */
     private void callJavascript(String script) {
-
         webview.loadUrl(script);
-
     }
 
     /**
@@ -459,10 +469,8 @@ public class MainActivity extends AppCompatActivity {
      */
     public void callOutBrowser(String url) {
         try {
-
             Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
             startActivity(i);
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -556,12 +564,15 @@ public class MainActivity extends AppCompatActivity {
 
         @JavascriptInterface
         public String getVariable(final String key) {
+            Log.d(">>> getVariable key : ",CPreferences.getPreferences(context, key));
             return CPreferences.getPreferences(context, key);
         }
 
         @JavascriptInterface
         public void setVariable(final String key, final String value) {
             CPreferences.setPreferences(context, key, value);
+            Log.d(">>> setVariable key : ",key);
+            Log.d(">>> setVariable value : ",value);
         }
         @JavascriptInterface
         public void callOutBrowser(final String url) {
@@ -576,8 +587,9 @@ public class MainActivity extends AppCompatActivity {
         @JavascriptInterface
         public void callAnotherView(final String url) {
             try {
+                Log.d(">>>>> callAnotherView url : ",url);
                 Intent i = new Intent(context, DetailActivity.class);
-                i.putExtra("URL",url);
+                i.putExtra("url",url);
                 startActivity(i);
             } catch (Exception e) {
                 e.printStackTrace();
