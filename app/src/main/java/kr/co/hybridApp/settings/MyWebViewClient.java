@@ -1,22 +1,19 @@
-package kr.co.hybridApp.settings;
+package kr.co.hybridapp.settings;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
-import java.io.File;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.os.Build;
-import android.os.Environment;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 import android.view.View;
-import android.webkit.MimeTypeMap;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;

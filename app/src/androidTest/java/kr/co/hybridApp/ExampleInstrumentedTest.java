@@ -1,4 +1,4 @@
-package kr.co.hybridApp;
+package kr.co.hybridapp;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;

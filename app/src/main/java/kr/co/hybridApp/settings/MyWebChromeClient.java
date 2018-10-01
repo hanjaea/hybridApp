@@ -1,4 +1,4 @@
-package kr.co.hybridApp.settings;
+package kr.co.hybridapp.settings;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -9,7 +9,7 @@ import android.webkit.GeolocationPermissions.Callback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
-import kr.co.hybridApp.R;
+import kr.co.hybridapp.R;
 
 
 /**

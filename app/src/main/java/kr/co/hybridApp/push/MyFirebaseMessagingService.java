@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package kr.co.hybridApp.push;
+package kr.co.hybridapp.push;
 
 import android.util.Log;
 
@@ -26,8 +26,8 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Map;
 
-import kr.co.hybridApp.R;
-import kr.co.hybridApp.util.NotificationUtil;
+import kr.co.hybridapp.R;
+import kr.co.hybridapp.util.NotificationUtil;
 
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {

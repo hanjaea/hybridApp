@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package kr.co.hybridApp.push;
+package kr.co.hybridapp.push;
 
 import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 
-import kr.co.hybridApp.util.CPreferences;
+import kr.co.hybridapp.util.CPreferences;
 
 /**
  * 앱 실행 시 토큰 정보를 받아오는 class
@@ -35,7 +35,7 @@ public class MyFirebaseInstanceIDService extends FirebaseInstanceIdService {
     public void onTokenRefresh() {
         // Get updated InstanceID token.
         String refreshedToken = FirebaseInstanceId.getInstance().getToken();
-        Log.d(TAG, refreshedToken);
+        Log.d(TAG+" refreshedToken : ", refreshedToken);
         CPreferences.setPreferences(getApplicationContext(),"tokenId",refreshedToken);
 
     }

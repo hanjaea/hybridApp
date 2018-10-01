@@ -1,4 +1,4 @@
-package kr.co.hybridApp.push;
+package kr.co.hybridapp.push;
 
 import android.util.Log;
 

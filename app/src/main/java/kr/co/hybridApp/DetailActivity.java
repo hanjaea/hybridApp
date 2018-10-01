@@ -1,32 +1,16 @@
-package kr.co.hybridApp;
+package kr.co.hybridapp;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.DownloadManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
-import android.provider.MediaStore;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.webkit.CookieManager;
@@ -34,20 +18,17 @@ import android.webkit.CookieSyncManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.HttpURLConnection;
 import java.util.Timer;
-import java.util.TimerTask;
 
-import kr.co.hybridApp.receiver.DownloadReceiver;
-import kr.co.hybridApp.settings.MyWebChromeClient;
-import kr.co.hybridApp.settings.MyWebViewClient;
-import kr.co.hybridApp.settings.WebViewSetting;
-import kr.co.hybridApp.util.CPreferences;
-import kr.co.hybridApp.util.SystemUtil;
+import kr.co.hybridapp.receiver.DownloadReceiver;
+import kr.co.hybridapp.settings.MyWebChromeClient;
+import kr.co.hybridapp.settings.MyWebViewClient;
+import kr.co.hybridapp.settings.WebViewSetting;
+import kr.co.hybridapp.util.CPreferences;
+import kr.co.hybridapp.util.SystemUtil;
 
 /**
  * 애플리케이션 상세 웹뷰 화면
@@ -59,10 +40,12 @@ import kr.co.hybridApp.util.SystemUtil;
 public class DetailActivity extends AppCompatActivity {
     public final int REQUEST_CODE = 0;
 
-    private final String BASE_URL = "https://www.flagone.co.kr/";
-    //private final String BASE_URL = "http://10.59.35.70/";
+    //private final String BASE_URL = "https://www.flagone.co.kr/";
+    //private final String BASE_URL = "http://localhost:8080/";
+    private final String BASE_URL = "http://192.168.0.243:8080";
 
-    private final String MAIN_URL = "mobile/mobileMain.do";
+    private final String MAIN_URL = "mobile/main/main.do";
+    private final String LOGIN_URL = "mobile/login.do";
 
     private String activityName = "DetailActivity";
     private String LinkUrl = "";
@@ -106,8 +89,8 @@ public class DetailActivity extends AppCompatActivity {
             String isPushClick = CPreferences.getPreferences(context,"isPushClick");
             Log.d(">> DetailActivity isPushClick : ", isPushClick);
 
-            //webview.loadUrl(BASE_URL + subUrl, WebViewSetting.setHeader(context)); //메인페이지 로드
-            webview.loadUrl("file:///android_asset/www/detail.html", WebViewSetting.setHeader(context));
+            webview.loadUrl(BASE_URL+LinkUrl, WebViewSetting.setHeader(context)); //메인페이지 로드
+            //webview.loadUrl("file:///android_asset/www/detail.html", WebViewSetting.setHeader(context));
             Log.d("DetailActivity LinkUrl", LinkUrl==null?"null":LinkUrl);
             //webview.loadUrl(LinkUrl, WebViewSetting.setHeader(context));
             // 푸시로 상세화면 접근 시 리스트화면 접근 시 인트로 화면보여지는 것을 막는다
@@ -129,7 +112,7 @@ public class DetailActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
 
-        unregisterReceiver(mOnComplete);
+        //unregisterReceiver(mOnComplete);
         // 웹뷰 캐쉬 정리
         webViewClearCache();
 

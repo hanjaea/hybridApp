@@ -6,10 +6,10 @@ public class URLConstants {
     //public static final String SPLASH_URL = "http://bus.ohnaebus.com/main/splash.do";
 
     //private final String URL_DOMAIN = "https://www.flagone.co.kr/";
-    public static final String URL_DOMAIN = "http://192.168.0.99:8080/";
+    public static final String URL_DOMAIN = "http://www.gmkapp.com";
 
-    public static final String MAIN_URL = "mobile/main/main.do";
-    public static final String LOGIN_URL = "mobile/login.do";
+    public static final String MAIN_URL = "/mobile/main/main.do";
+    public static final String LOGIN_URL = "/mobile/login.do";
 
     public static class NET {
         public static final String APP_VERSION = URL_DOMAIN + "";

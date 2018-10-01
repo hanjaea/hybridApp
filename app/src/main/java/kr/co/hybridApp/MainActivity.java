@@ -147,6 +147,7 @@ public class MainActivity extends AppCompatActivity {
     private void funcResume(){
         String AUTO_LOGIN_TOKEN = CPreferences.getPreferences(context,"AUTO_LOGIN_TOKEN");
         Log.d(">>>  onResume AUTO_LOGIN_TOKEN ", AUTO_LOGIN_TOKEN);
+        Log.d(">>>  onResume mFlag ", String.valueOf(mFlag));
 
         if(mFlag) {
             Bundle extras = getIntent().getExtras();
@@ -180,7 +181,7 @@ public class MainActivity extends AppCompatActivity {
                         webview.loadUrl(URL_DOMAIN + URLConstants.LOGIN_URL, WebViewSetting.setHeader(context)); //로그인페이지
                     }
                 }else {
-                    webview.loadUrl(url, WebViewSetting.setHeader(context));
+                    webview.loadUrl( URL_DOMAIN + url, WebViewSetting.setHeader(context));
                 }
 
                 CPreferences.setPreferences(context, "url", "");
