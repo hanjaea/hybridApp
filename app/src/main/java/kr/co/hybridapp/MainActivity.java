@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -58,6 +59,7 @@ public class MainActivity extends AppCompatActivity {
     private Timer timer; //하드웨어 Back Key를 두번 누르는 사이에 2초가 지났는지 체크
 
     private String url = null;
+    private boolean mResume = false;
     private boolean mFlag = false;
     private DownloadReceiver mOnComplete = new DownloadReceiver();
     private String URL_DOMAIN = URLConstants.URL_DOMAIN;
@@ -137,7 +139,9 @@ public class MainActivity extends AppCompatActivity {
             initWebView();
 
             // onResume 에서 호출할 함수 호출
-            funcResume();
+            if(!mResume) {
+                funcResume();
+            }
         }
     }
 
@@ -148,8 +152,9 @@ public class MainActivity extends AppCompatActivity {
         String AUTO_LOGIN_TOKEN = CPreferences.getPreferences(context,"AUTO_LOGIN_TOKEN");
         Log.d(">>>  onResume AUTO_LOGIN_TOKEN ", AUTO_LOGIN_TOKEN);
         Log.d(">>>  onResume mFlag ", String.valueOf(mFlag));
-
-        if(mFlag) {
+        Log.d(">>> getPreferences url", CPreferences.getPreferences(context,"url"));
+        mResume = true;
+        //if(mFlag) {
             Bundle extras = getIntent().getExtras();
             Log.d(">>> 1 MainActivity onResume ", "onResume");
             if (extras != null) {
@@ -181,15 +186,26 @@ public class MainActivity extends AppCompatActivity {
                         webview.loadUrl(URL_DOMAIN + URLConstants.LOGIN_URL, WebViewSetting.setHeader(context)); //로그인페이지
                     }
                 }else {
-                    webview.loadUrl( URL_DOMAIN + url, WebViewSetting.setHeader(context));
+                    if(CPreferences.getPreferences(context, "AUTO_LOGIN_TOKEN") != null && !CPreferences.getPreferences(context, "AUTO_LOGIN_TOKEN").isEmpty()){
+                        webview.loadUrl(URL_DOMAIN + URLConstants.MAIN_URL, WebViewSetting.setHeader(context)); //메인페이지
+                        new Handler().postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                webview.loadUrl(URL_DOMAIN + url, WebViewSetting.setHeader(context));
+                            }
+                        }, 1000);
+                    }else {
+                        webview.loadUrl(URL_DOMAIN + url, WebViewSetting.setHeader(context));
+                    }
                 }
 
                 CPreferences.setPreferences(context, "url", "");
                 //CPreferences.setPreferences(context, "isPushClick", "false");
                 getIntent().removeExtra("url");
-                url = null;
+                //url = null;
+                //mFlag = false;
 
-            }
+            //}
         }
     }
 
@@ -247,7 +263,9 @@ public class MainActivity extends AppCompatActivity {
         * 앱 최초 집입시에는 mFlag 가 false 이므로 호출되지 않을 것이지만 퍼미션 다이얼로그 박스 호출 뒤 사용자가
         * 퍼미션 수락 후 PermissionSuccess() 함수가 호출되면 아래 함수도 함께 호출 된다.
         **/
-        funcResume();
+        if(!mResume) {
+            funcResume();
+        }
 
 
         String tokenId = CPreferences.getPreferences(context,"tokenId");
@@ -258,6 +276,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
+        mResume = false;
 
     }
 
