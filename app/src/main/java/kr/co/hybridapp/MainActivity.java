@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d(">>> 1 MainActivity IsFirst : ", IsFirst);
             if (IsFirst == null || "false".equals(IsFirst)) {
                 CPreferences.setPreferences(context, "IsFirst", "true");
-                startActivity(new Intent(context, SplashActivity.class));
+                startActivity(new Intent(context, IntroActivity.class));
             }
 
             // 사용자 폰이 모델정보를 저장한다.

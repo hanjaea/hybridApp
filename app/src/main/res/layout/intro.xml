@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<AbsoluteLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:layout_weight="1"
@@ -10,7 +10,14 @@
         android:id="@+id/imageview"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_weight="1"
-        android:src="@drawable/splash"></ImageView>
+        android:src="@drawable/splash"
+        android:visibility="visible"></ImageView>
 
-</AbsoluteLayout>
+    <WebView
+        android:id="@+id/webviewIntro"
+        android:fitsSystemWindows="true"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:visibility="gone"></WebView>
+
+</FrameLayout>
