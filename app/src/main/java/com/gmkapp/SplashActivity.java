@@ -1,4 +1,4 @@
-package kr.co.hybridapp;
+package com.gmkapp;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -11,13 +11,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Window;
-import android.view.WindowManager;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import org.json.JSONObject;
 import java.util.HashMap;
-import kr.co.hybridapp.util.HttpConnectionUtil;
+import com.gmkapp.util.HttpConnectionUtil;
 
 /**
  * 인트로 액티비티 개발환경 : Android 5.1 테스트 디바이스 : Samsung Galaxy S4 (Android 5.0.1)

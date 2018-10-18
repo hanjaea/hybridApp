@@ -1,4 +1,4 @@
-package kr.co.hybridapp.settings;
+package com.gmkapp.settings;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;

@@ -1,52 +1,27 @@
-package kr.co.hybridapp;
+package com.gmkapp;
 
-import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.AlertDialog;
-import android.app.DownloadManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.webkit.CookieManager;
-import android.webkit.CookieSyncManager;
-import android.webkit.DownloadListener;
-import android.webkit.JavascriptInterface;
-import android.webkit.WebSettings;
-import android.webkit.WebView;
 import android.widget.Toast;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import org.json.JSONObject;
 
-import java.io.File;
-import java.net.HttpURLConnection;
 import java.util.HashMap;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import kr.co.hybridapp.receiver.DownloadReceiver;
-import kr.co.hybridapp.settings.MyWebChromeClient;
-import kr.co.hybridapp.settings.MyWebViewClient;
-import kr.co.hybridapp.settings.WebViewSetting;
-import kr.co.hybridapp.util.CPreferences;
-import kr.co.hybridapp.util.HttpConnectionUtil;
-import kr.co.hybridapp.util.SystemUtil;
-import kr.co.hybridapp.util.URLConstants;
+import com.gmkapp.util.HttpConnectionUtil;
+import com.gmkapp.util.URLConstants;
 
 /**
  * 애플리케이션 메인 웹뷰 초기화면...

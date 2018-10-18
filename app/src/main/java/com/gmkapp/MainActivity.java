@@ -1,4 +1,4 @@
-package kr.co.hybridapp;
+package com.gmkapp;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -32,13 +32,13 @@ import java.net.HttpURLConnection;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import kr.co.hybridapp.receiver.DownloadReceiver;
-import kr.co.hybridapp.util.CPreferences;
-import kr.co.hybridapp.settings.WebViewSetting;
-import kr.co.hybridapp.settings.MyWebViewClient;
-import kr.co.hybridapp.settings.MyWebChromeClient;
-import kr.co.hybridapp.util.SystemUtil;
-import kr.co.hybridapp.util.URLConstants;
+import com.gmkapp.receiver.DownloadReceiver;
+import com.gmkapp.util.CPreferences;
+import com.gmkapp.settings.WebViewSetting;
+import com.gmkapp.settings.MyWebViewClient;
+import com.gmkapp.settings.MyWebChromeClient;
+import com.gmkapp.util.SystemUtil;
+import com.gmkapp.util.URLConstants;
 
 /**
  * 애플리케이션 메인 웹뷰 초기화면...
@@ -59,7 +59,8 @@ public class MainActivity extends AppCompatActivity {
     private Timer timer; //하드웨어 Back Key를 두번 누르는 사이에 2초가 지났는지 체크
 
     private String url = null;
-    private boolean mResume = false;
+    private static boolean mResume = false;
+    public static boolean mPause = false;
     private boolean mFlag = false;
     private DownloadReceiver mOnComplete = new DownloadReceiver();
     private String URL_DOMAIN = URLConstants.URL_DOMAIN;
@@ -69,8 +70,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(">>> 1 MainActivity onCreate ", "onCreate");
+        Log.d("onCreate", " onResume :" + mResume + " mPause : " + mPause);
         context = this;
 
+        String tokenId = CPreferences.getPreferences(context,"tokenId");
+        Log.d(">>>> tokenId : ", tokenId);
         // 앱 루팅 체크로직
         if(isRooted()){
 
@@ -259,6 +263,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        Log.d("onResume", ">>>> onResume :" + mResume + " mPause : " + mPause);
         /**
         * 앱 최초 집입시에는 mFlag 가 false 이므로 호출되지 않을 것이지만 퍼미션 다이얼로그 박스 호출 뒤 사용자가
         * 퍼미션 수락 후 PermissionSuccess() 함수가 호출되면 아래 함수도 함께 호출 된다.
@@ -266,7 +271,6 @@ public class MainActivity extends AppCompatActivity {
         if(!mResume) {
             funcResume();
         }
-
 
         String tokenId = CPreferences.getPreferences(context,"tokenId");
         Log.d(">>>> tokenId : ", tokenId);
@@ -276,7 +280,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        mResume = false;
+        //mResume = false;
+        mPause = true;
+        Log.d("onPause", ">>>> onPause :" + mPause);
 
     }
 

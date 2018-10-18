@@ -1,4 +1,4 @@
-package kr.co.hybridapp;
+package com.gmkapp;
 
 import android.annotation.SuppressLint;
 import android.app.DownloadManager;
@@ -23,12 +23,12 @@ import java.io.File;
 import java.net.HttpURLConnection;
 import java.util.Timer;
 
-import kr.co.hybridapp.receiver.DownloadReceiver;
-import kr.co.hybridapp.settings.MyWebChromeClient;
-import kr.co.hybridapp.settings.MyWebViewClient;
-import kr.co.hybridapp.settings.WebViewSetting;
-import kr.co.hybridapp.util.CPreferences;
-import kr.co.hybridapp.util.SystemUtil;
+import com.gmkapp.receiver.DownloadReceiver;
+import com.gmkapp.settings.MyWebChromeClient;
+import com.gmkapp.settings.MyWebViewClient;
+import com.gmkapp.settings.WebViewSetting;
+import com.gmkapp.util.CPreferences;
+import com.gmkapp.util.SystemUtil;
 
 /**
  * 애플리케이션 상세 웹뷰 화면

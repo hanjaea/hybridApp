@@ -1,4 +1,4 @@
-package kr.co.hybridapp;
+package com.gmkapp;
 
 import org.junit.Test;
 

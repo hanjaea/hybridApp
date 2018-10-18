@@ -1,4 +1,4 @@
-package kr.co.hybridapp;
+package com.gmkapp;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("kr.co.hybridApp", appContext.getPackageName());
+        assertEquals("com.gmkapp", appContext.getPackageName());
     }
 }

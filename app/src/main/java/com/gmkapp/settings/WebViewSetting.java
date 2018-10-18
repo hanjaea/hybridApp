@@ -1,4 +1,4 @@
-package kr.co.hybridapp.settings;
+package com.gmkapp.settings;
 
 import android.content.Context;
 import android.os.Build;
@@ -6,7 +6,7 @@ import android.os.Build;
 import java.util.HashMap;
 import java.util.Map;
 
-import kr.co.hybridapp.util.CPreferences;
+import com.gmkapp.util.CPreferences;
 
 
 /**

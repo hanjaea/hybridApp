@@ -1,4 +1,4 @@
 <resources>
     <string name="default_notification_channel_id">hybridApp_noti</string>
-    <string name="app_name">HybridApp</string>
+    <string name="app_name">GMK 사내앱</string>
 </resources>

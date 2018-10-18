@@ -1,4 +1,4 @@
-package kr.co.hybridapp.util;
+package com.gmkapp.util;
 
 import java.io.BufferedReader;
 import java.io.IOException;

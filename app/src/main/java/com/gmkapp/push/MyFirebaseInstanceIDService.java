@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package kr.co.hybridapp.push;
+package com.gmkapp.push;
 
 import android.util.Log;
 
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.FirebaseInstanceIdService;
 
-import kr.co.hybridapp.util.CPreferences;
+import com.gmkapp.util.CPreferences;
 
 /**
  * 앱 실행 시 토큰 정보를 받아오는 class

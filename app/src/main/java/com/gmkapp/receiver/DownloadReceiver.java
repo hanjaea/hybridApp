@@ -1,4 +1,4 @@
-package kr.co.hybridapp.receiver;
+package com.gmkapp.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

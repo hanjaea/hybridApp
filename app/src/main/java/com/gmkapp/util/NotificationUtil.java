@@ -1,4 +1,4 @@
-package kr.co.hybridapp.util;
+package com.gmkapp.util;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -12,8 +12,8 @@ import android.support.v4.app.NotificationCompat;
 
 import java.util.Random;
 
-import kr.co.hybridapp.MainActivity;
-import kr.co.hybridapp.R;
+import com.gmkapp.MainActivity;
+import com.gmkapp.R;
 
 //import kr.co.hybridapp.R;
 
