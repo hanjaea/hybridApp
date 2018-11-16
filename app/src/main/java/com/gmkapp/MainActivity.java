@@ -12,8 +12,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
-import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -21,14 +19,11 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
-import android.webkit.ConsoleMessage;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.DownloadListener;
-import android.webkit.GeolocationPermissions;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
-import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.widget.Toast;
@@ -67,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
     public static final int INTRO_RESULTCODE = 1;
     public static final String TAG = MainActivity.class.getSimpleName();
     public static ValueCallback<Uri> mUploadMessage;
-    public Uri mCapturedImageURI = null;
     public ValueCallback<Uri[]> mFilePathCallback;
     public static String mCameraPhotoPath;
     public static final String TYPE_IMAGE = "image/*";
@@ -94,8 +88,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Log.d("MainActivity",">>> 1 MainActivity onCreate ");
-        Log.d("MainActivity ","onCreate onResume :" + mResume + " mPause : " + mPause);
         context = this;
         mMainactivity = this;
 
@@ -103,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
         webSettings = webview.getSettings();
         mHeader = WebViewSetting.setHeader(context);
         String tokenId = CPreferences.getPreferences(context,"tokenId");
-        Log.d(">>>> tokenId : ", tokenId);
+
         // 앱 루팅 체크로직
         if(isRooted()){
 
@@ -131,9 +123,6 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
         isStoragePermissionGranted();
-
-        Log.d("MainActivity",">>>> isStoragePermissionGranted :"+ String.valueOf(mFlag));
-
     }
 
     /**
@@ -141,8 +130,6 @@ public class MainActivity extends AppCompatActivity {
      */
     private void PermissionSuccess(){
         if(mFlag) {
-
-            //startActivity(new Intent(context, IntroActivity.class));
             Intent i = new Intent(this, IntroActivity.class);
             startActivityForResult(i, INTRO_RESULTCODE);
 
@@ -169,7 +156,6 @@ public class MainActivity extends AppCompatActivity {
 
             // onResume 에서 호출할 함수 호출
             if(!mResume) {
-                //startActivity(new Intent(context, IntroActivity.class));
                 funcResume();
             }
         }
@@ -180,10 +166,7 @@ public class MainActivity extends AppCompatActivity {
      */
     private void funcResume(){
         String AUTO_LOGIN_TOKEN = CPreferences.getPreferences(context,"AUTO_LOGIN_TOKEN");
-        Log.d("MainActivity",">>>  funcResume AUTO_LOGIN_TOKEN :" + AUTO_LOGIN_TOKEN);
         mResume = true;
-        //Log.d("MainActivity", ">>> 1 MainActivity URL"+ url == null ? "null" : url);
-        //Log.d("MainActivity", ">>> 1 MainActivity isPushClick"+ CPreferences.getPreferences(context, "isPushClick"));
         // 푸시를 통해 들어온 경우 해당 url로 바로 진입 처리 하는 로직
         if (webview != null && goUrl) {
             if(CPreferences.getPreferences(context, "AUTO_LOGIN_TOKEN") != null && !CPreferences.getPreferences(context, "AUTO_LOGIN_TOKEN").isEmpty()){
@@ -245,7 +228,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
-        Log.d("MainActivity", ">>>> onResume :" + mResume + " mPause : " + mPause);
         /**
         * 앱 최초 집입시에는 mFlag 가 false 이므로 호출되지 않을 것이지만 퍼미션 다이얼로그 박스 호출 뒤 사용자가
         * 퍼미션 수락 후 PermissionSuccess() 함수가 호출되면 아래 함수도 함께 호출 된다.
@@ -259,10 +241,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        //mResume = false;
         mPause = true;
-        Log.d("MainActivity", ">>>> onPause :" + mPause);
-
     }
 
     @Override
@@ -278,8 +257,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-
-
     }
 
     /**
@@ -287,8 +264,6 @@ public class MainActivity extends AppCompatActivity {
      */
     @SuppressWarnings("deprecation")
     public void initWebView() {
-        Log.d(">>>> ","initWebView()");
-
 
         webview.addJavascriptInterface(new AndroidBridge(), "AppDroid");    //Javascript와 통신을 위한 JavascriptInterface 추가
         webview.setVerticalScrollBarEnabled(false);             //웹뷰 자체 스크롤을 제거
@@ -303,46 +278,6 @@ public class MainActivity extends AppCompatActivity {
         }else {
             webview.setLayerType(View.LAYER_TYPE_SOFTWARE, null);
         }
-
-        webview.setDownloadListener(new DownloadListener() {    // 파일다운로드 리스트 등록
-            public void onDownloadStart(String url, String userAgent,
-                                        String contentDisposition, String mimetype,
-                                        long contentLength) {
-
-                try {
-                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-                    request.setMimeType(mimetype);
-                    request.addRequestHeader("User-Agent", userAgent);
-                    request.setDescription("Downloading file");
-                    String fileName = contentDisposition.replace("inline; filename=", "");
-                    fileName = fileName.replaceAll("\"", "");
-                    request.setTitle(fileName);
-                    request.allowScanningByMediaScanner();
-                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, fileName);
-                    DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-                    dm.enqueue(request);
-                    Toast.makeText(getApplicationContext(), "Downloading File", Toast.LENGTH_LONG).show();
-                } catch (Exception e) {
-
-                    if (ContextCompat.checkSelfPermission(MainActivity.this,
-                            android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                            != PackageManager.PERMISSION_GRANTED) {
-                        // Should we show an explanation?
-                        if (ActivityCompat.shouldShowRequestPermissionRationale(MainActivity.this,
-                                android.Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-                            Toast.makeText(getBaseContext(), "첨부파일 다운로드를 위해\n동의가 필요합니다.", Toast.LENGTH_LONG).show();
-                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                    110);
-                        } else {
-                            Toast.makeText(getBaseContext(), "첨부파일 다운로드를 위해\n동의가 필요합니다.", Toast.LENGTH_LONG).show();
-                            ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                                    110);
-                        }
-                    }
-                }
-            }
-        });
 
         HttpURLConnection.setFollowRedirects(true);                         // 보안접속 사용설정
         webSettings.setPluginState(WebSettings.PluginState.ON);             // 플러그인 사용 설정
@@ -378,26 +313,6 @@ public class MainActivity extends AppCompatActivity {
         webview.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
         webview.setWebViewClient(new MyWebViewClient(context, activityName));       // WebViewClient (front 에서 오고가는 http url 을 인터셉터 하여 네이티브에서 가공처리 할 수 있다)
         webview.setWebChromeClient(new MyWebChromeClient(context, mMainactivity));                 // WebChromeClient (javascript alert, dialog 를 네이티브 다이얼로그 방식으로 표현해 준다.)
-
-        Bundle extras = getIntent().getExtras();
-
-        Log.d(">>> AUTO_LOGIN_TOKEN : ", CPreferences.getPreferences(context, "AUTO_LOGIN_TOKEN"));
-        Log.d(">>> AUTO_LOGIN_TOKEN value of : ", String.valueOf(CPreferences.getPreferences(context, "AUTO_LOGIN_TOKEN").isEmpty()));
-
-
-        String MOB_IDTF_CHAR = mHeader.get("MOB_IDTF_CHAR");
-        String AUTO_LOGIN_TOKEN = mHeader.get("AUTO_LOGIN_TOKEN");
-
-        Log.d(">>> MOB_IDTF_CHAR : ",MOB_IDTF_CHAR);
-        Log.d(">>> AUTO_LOGIN_TOKEN : ",AUTO_LOGIN_TOKEN);
-
-        // Intent를 통해 Bundle 값이 있을 경우 해당 주소로 이동
-        //if(goUrl && CPreferences.getPreferences(context, "AUTO_LOGIN_TOKEN") != null && !CPreferences.getPreferences(context, "AUTO_LOGIN_TOKEN").isEmpty()){
-        //    webview.loadUrl(URL_DOMAIN + URLConstants.MAIN_URL, mHeader); //메인페이지
-        //}else{
-        //    webview.loadUrl(URL_DOMAIN + URLConstants.LOGIN_URL, mHeader); //로그인페이지
-        //}
-
 
     }
 
@@ -571,20 +486,17 @@ public class MainActivity extends AppCompatActivity {
     public  boolean isStoragePermissionGranted() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED || checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-                Log.v(TAG,"Permission is granted");
+                    == PackageManager.PERMISSION_GRANTED) {
                 mFlag = true;
                 PermissionSuccess();
                 return true;
             } else {
-                Log.v(TAG,"Permission is revoked");
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.CAMERA}, REQUEST_CODE);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
                 mFlag = false;
                 return false;
             }
         }
         else { //permission is automatically granted on sdk<23 upon installation
-            Log.v(TAG,"Permission is granted");
             mFlag = true;
             return true;
         }
@@ -601,15 +513,12 @@ public class MainActivity extends AppCompatActivity {
 
         @JavascriptInterface
         public String getVariable(final String key) {
-            Log.d(">>> getVariable key : ",CPreferences.getPreferences(context, key));
             return CPreferences.getPreferences(context, key);
         }
 
         @JavascriptInterface
         public void setVariable(final String key, final String value) {
             CPreferences.setPreferences(context, key, value);
-            Log.d(">>> setVariable key : ",key);
-            Log.d(">>> setVariable value : ",value);
         }
         @JavascriptInterface
         public void callOutBrowser(final String url) {
@@ -626,28 +535,6 @@ public class MainActivity extends AppCompatActivity {
         public void setWebviewUrl(final String url) {
             webview.loadUrl(url,WebViewSetting.setHeader(context));
         }
-
-
-        @JavascriptInterface
-        public void fileDownload(final String url, final String ext, final String istrue) {
-            mMainactivity.istrue = istrue;
-            DownloadManager mdDownloadManager = (DownloadManager) context
-                    .getSystemService(Context.DOWNLOAD_SERVICE);
-            DownloadManager.Request req = new DownloadManager.Request(
-                    Uri.parse(url));
-            File destinationFile = new File(
-                    Environment.getExternalStorageDirectory(),
-                    SystemUtil.getFileName(url, ext));
-            req.setDescription("파일 다운로드 중입니다..");
-            req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-            req.setDestinationUri(Uri.fromFile(destinationFile));
-            mdDownloadManager.enqueue(req);
-
-            registerReceiver(mOnComplete, new IntentFilter(
-                    DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-
-        }
-
 
         @JavascriptInterface
         public void fileDownload(final String url, final String ext) {
@@ -690,7 +577,6 @@ public class MainActivity extends AppCompatActivity {
                 }
                 Uri result = getResultUri(data);
 
-                Log.d(getClass().getName(), "openFileChooser : " + result);
                 mUploadMessage.onReceiveValue(result);
                 mUploadMessage = null;
             }
