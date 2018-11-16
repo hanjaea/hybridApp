@@ -16,7 +16,6 @@ import java.util.Set;
 /**
  * HttpConnectionUtil 클래스
  * URL과 HashMap 형태의 파라미터를 받아 서버 요청 후 결과를 반환한다
- * @author YT
  */
 public class HttpConnectionUtil{
 	

@@ -22,8 +22,6 @@ import android.webkit.WebViewClient;
 /**
  * 웹뷰클라이언트 클래스
  * 주유기능 : url,로드 시작 종료 시점,에러사항 캐치
- *
- * @author YT
  */
 
 public class MyWebViewClient extends WebViewClient {
@@ -43,78 +41,12 @@ public class MyWebViewClient extends WebViewClient {
     @SuppressWarnings("deprecation")
     @Override
     public boolean shouldOverrideUrlLoading(WebView view, String url) {
-        /*
-        boolean value = true;
-        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
-
-        if (extension != null) {
-            MimeTypeMap mime = MimeTypeMap.getSingleton();
-            String mimeType = mime.getMimeTypeFromExtension(extension);
-            if (mimeType != null) {
-                if (mimeType.toLowerCase().contains("video")
-                        || extension.toLowerCase().contains("mov")
-                        || extension.toLowerCase().contains("mp3")
-                        || extension.toLowerCase().contains("mp4")) {
-                    DownloadManager mdDownloadManager = (DownloadManager) context
-                            .getSystemService(Context.DOWNLOAD_SERVICE);
-                    DownloadManager.Request request = new DownloadManager.Request(
-                            Uri.parse(url));
-                    File destinationFile = new File(
-                            Environment.getExternalStorageDirectory(),
-                            getFileName(url));
-                    request.setDescription("파일 다운로드 중입니다..");
-                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                    request.setDestinationUri(Uri.fromFile(destinationFile));
-                    mdDownloadManager.enqueue(request);
-                    value = false;
-                }
-            }
-            if (value) {
-                view.loadUrl(url);
-            }
-            return true;
-        }
-        */
 
         if (url.startsWith("tel:")) {
             Intent tel = new Intent(Intent.ACTION_DIAL, Uri.parse(url));
             context.startActivity(tel);
             return true;
         }
-
-        /*
-        if(url.endsWith(".png")){
-            Uri source = Uri.parse(url);
-            // Make a new request pointing to the .apk url
-            DownloadManager.Request request = new DownloadManager.Request(source);
-            // appears the same in Notification bar while downloading
-            request.setDescription("Description for the DownloadManager Bar");
-            request.setTitle("YourApp.png");
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-                request.allowScanningByMediaScanner();
-                request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-            }
-            // save the file in the "Downloads" folder of SDCARD
-            request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, "SmartPigs.apk");
-            // get download service and enqueue file
-            DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-            manager.enqueue(request);
-            return true;
-        }
-
-        if(url.endsWith(".mp4")){
-            view.loadUrl(url);
-            return true;
-        }
-        */
-
-//        Log.e("----" , "URL---" + url);
-//        Log.e("----" , "MOB_PUSH_TOKEN---" + WebViewSetting.setHeader(context).get("MOB_PUSH_TOKEN"));
-//        Log.e("----" , "MOB_TRMNL_OS_VER---" + WebViewSetting.setHeader(context).get("MOB_TRMNL_OS_VER"));
-//        Log.e("----" , "MOB_TRMNL_OS_TYPE---" + WebViewSetting.setHeader(context).get("MOB_TRMNL_OS_TYPE"));
-//        Log.e("----" , "MOB_IDTF_CHAR---" + WebViewSetting.setHeader(context).get("MOB_IDTF_CHAR"));
-//        Log.e("----" , "MOB_TRMNL_MODEL_NAME---" + WebViewSetting.setHeader(context).get("MOB_TRMNL_MODEL_NAME"));
-
 
         view.loadUrl(url, WebViewSetting.setHeader(context));
 
@@ -128,55 +60,13 @@ public class MyWebViewClient extends WebViewClient {
     public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
         String url = request.getUrl().toString();
 
-        /*
-        boolean value = true;
-        String extension = MimeTypeMap.getFileExtensionFromUrl(url);
-
-        if (extension != null) {
-            MimeTypeMap mime = MimeTypeMap.getSingleton();
-            String mimeType = mime.getMimeTypeFromExtension(extension);
-            if (mimeType != null) {
-                if (mimeType.toLowerCase().contains("video")
-                        || extension.toLowerCase().contains("mov")
-                        || extension.toLowerCase().contains("mp3")
-                        || extension.toLowerCase().contains("mp4")) {
-                    DownloadManager mdDownloadManager = (DownloadManager) context
-                            .getSystemService(Context.DOWNLOAD_SERVICE);
-                    DownloadManager.Request req = new DownloadManager.Request(
-                            Uri.parse(url));
-                    File destinationFile = new File(
-                            Environment.getExternalStorageDirectory(),
-                            getFileName(url));
-                    req.setDescription("파일 다운로드 중입니다..");
-                    req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
-                    req.setDestinationUri(Uri.fromFile(destinationFile));
-                    mdDownloadManager.enqueue(req);
-                    value = false;
-                }
-            }
-            if (value) {
-                view.loadUrl(url);
-            }
-            return true;
-        }
-        */
-
         if (url.startsWith("tel:")) {
             Intent tel = new Intent(Intent.ACTION_DIAL, Uri.parse(url));
             context.startActivity(tel);
             return true;
         }
 
-//        Log.e("----" , "URL---" + url);
-//        Log.e("----" , "MOB_PUSH_TOKEN---" + WebViewSetting.setHeader(context).get("MOB_PUSH_TOKEN"));
-//        Log.e("----" , "MOB_TRMNL_OS_VER---" + WebViewSetting.setHeader(context).get("MOB_TRMNL_OS_VER"));
-//        Log.e("----" , "MOB_TRMNL_OS_TYPE---" + WebViewSetting.setHeader(context).get("MOB_TRMNL_OS_TYPE"));
-//        Log.e("----" , "MOB_IDTF_CHAR---" + WebViewSetting.setHeader(context).get("MOB_IDTF_CHAR"));
-//        Log.e("----" , "MOB_TRMNL_MODEL_NAME---" + WebViewSetting.setHeader(context).get("MOB_TRMNL_MODEL_NAME"));
-
         view.loadUrl(url, WebViewSetting.setHeader(context));
-
-
 
         return false;
     }
@@ -200,10 +90,7 @@ public class MyWebViewClient extends WebViewClient {
 
 
     }
-//    @Override
-//    public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-//        handler.proceed();  //SSL 에러가 발생해도 계속 진행!
-//    }
+
     @Override
     public void onReceivedError(final WebView view, int errorCode, String description, String failingUrl) {
 
@@ -225,69 +112,19 @@ public class MyWebViewClient extends WebViewClient {
             case ERROR_UNSUPPORTED_SCHEME:
 
 
-                //view.loadUrl("file:///android_asset/error.html");    //에러페이지 출력
-                //view.clearHistory();
+            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+            builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int which) {
 
+                    view.reload();
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(context);
-                builder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int which) {
+                }
+            });
+            builder.setMessage("네트워크 상태가 원활하지 않습니다. 잠시 후 다시 시도해 주세요.");
+            builder.show();
 
-                        view.reload();
-
-                    }
-                });
-                builder.setMessage("네트워크 상태가 원활하지 않습니다. 잠시 후 다시 시도해 주세요.");
-                builder.show();
-
-                break;
+            break;
         }
     }
-//    @Override
-//    public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//
-//
-//            Map<String, String> extraHeaders = WebViewSetting.setHeader(context);
-//
-//            request.getRequestHeaders().put("MOB_PUSH_TOKEN", extraHeaders.get("MOB_PUSH_TOKEN"));
-//            request.getRequestHeaders().put("MOB_TRMNL_OS_VER", extraHeaders.get("MOB_TRMNL_OS_VER"));
-//            request.getRequestHeaders().put("MOB_TRMNL_OS_TYPE", extraHeaders.get("MOB_TRMNL_OS_TYPE"));
-//            request.getRequestHeaders().put("MOB_IDTF_CHAR", extraHeaders.get("MOB_IDTF_CHAR"));
-//            request.getRequestHeaders().put("MOB_TRMNL_MODEL_NAME", extraHeaders.get("MOB_TRMNL_MODEL_NAME"));
-//        }
-//
-//        return super.shouldInterceptRequest(view, request);
-//    }
-//
-//    @Override
-//    public WebResourceResponse shouldInterceptRequest(final WebView view, final String url) {
-//        // I need to updated the header here
-//
-//        return super.shouldInterceptRequest(view, url);
-//    }
 
-
-    /**
-     * File name from URL
-     *
-     * @param url
-     * @return
-     */
-    public String getFileName(String url) {
-        String filenameWithoutExtension = "";
-        String fileName = url.substring( url.lastIndexOf('/')+1, url.length() );
-        String fileNameWithoutExtn = fileName.substring(0, fileName.lastIndexOf('.'));
-
-
-        Date cDate = new Date();
-        String fDate = new SimpleDateFormat("yyyyMMddHHmmss").format(cDate);
-
-        //System.currentTimeMillis()
-        Log.d(">>>> MyWebViewClient fileName : ", fileName);
-        Log.d(">>>> MyWebViewClient fileNameWithoutExtn : ", fileNameWithoutExtn);
-        //filenameWithoutExtension = String.valueOf(fDate+"_"+fileName);
-        filenameWithoutExtension = String.valueOf(fDate+ ".mp4");
-        return filenameWithoutExtension;
-    }
 }

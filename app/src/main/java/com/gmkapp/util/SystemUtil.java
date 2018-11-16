@@ -30,7 +30,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
- * Created by bluemobile on 2018. 4. 10..
+ * SystemUtil.class
+ * 2018. 9. 10..
  */
 
 public class SystemUtil {
@@ -198,7 +199,7 @@ public class SystemUtil {
      * @param url
      * @return
      */
-    public static String getFileName(String url) {
+    public static String getFileName(String url, String ext) {
         String filenameWithoutExtension = "";
         String fileName = url.substring( url.lastIndexOf('/')+1, url.length() );
         String fileNameWithoutExtn = fileName.substring(0, fileName.lastIndexOf('.'));
@@ -211,7 +212,7 @@ public class SystemUtil {
         Log.d(">>>> MyWebViewClient fileName : ", fileName);
         Log.d(">>>> MyWebViewClient fileNameWithoutExtn : ", fileNameWithoutExtn);
         //filenameWithoutExtension = String.valueOf(fDate+"_"+fileName);
-        filenameWithoutExtension = String.valueOf(fDate+ ".mp4");
+        filenameWithoutExtension = String.valueOf(fDate+ "."+ ext);
         return filenameWithoutExtension;
     }
 
