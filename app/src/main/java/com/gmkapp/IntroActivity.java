@@ -197,7 +197,7 @@ public class IntroActivity extends AppCompatActivity {
                                     new DialogInterface.OnClickListener() {
                                         public void onClick(
                                                 DialogInterface dialog, int id) {
-                                            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=com.sirma.mobile.bible.android")); // com.gmkapp
+                                            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse("http://play.google.com/store/apps/details?id=com.gmkapp")); // com.gmkapp
                                             startActivity(i);
                                         }
                                     });

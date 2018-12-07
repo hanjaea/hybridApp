@@ -287,17 +287,22 @@ public class MainActivity extends AppCompatActivity {
 
 
         webSettings.setJavaScriptEnabled(true);                             // Javascript 허용
-        webSettings.setBuiltInZoomControls(false);                          // 줌 아이콘 사용 유무
+        webSettings.setBuiltInZoomControls(true);                          // 줌 아이콘 사용 유무
+        webSettings.setSupportZoom(true);                                   // 줌 사용여부 체크
         webSettings.setSupportMultipleWindows(true);                        // 여러개의 윈도우를 사용할 수 있도록 허용
         webSettings.setAppCacheEnabled(true);                               // 앱 캐시 허용
         webSettings.setAllowFileAccess(true);                               // 웹뷰 내에서 파일 접근 가능 여부
         webSettings.setJavaScriptCanOpenWindowsAutomatically(true);         // Javascript에서 window.open() 사용 허용
         webSettings.setLoadsImagesAutomatically(true);                      // 웹뷰가 앱에 등록된 이미지 리소스를 자동으로 로드하도록 설정
-        webSettings.setUseWideViewPort(false);                              // Wide Viewport 사용 유무
+        webSettings.setUseWideViewPort(true);                              // Wide Viewport 사용 유무
         webSettings.setSavePassword(false);                                 // 패스워드 저장 유무를 묻는창을 띄우지 않음
         webSettings.setDomStorageEnabled(true);                           // 로컬스토리지 허용
         //webSettings.setGeolocationEnabled(true);                          // 위치정보 사용 유무
         webSettings.setLoadWithOverviewMode(true);
+        webSettings.setDisplayZoomControls(false);
+
+        // front 에서 아래 meta tag를 삽입 해 주어야 한다. (아이폰은 상관없지만 안드로이드 때문에 해 줘야 한다)
+        // <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, minimum-scale=1.0, user-scalable=yes,target-densitydpi=medium-dpi">
 
 
         // 사용자 폰 버젼이 21 Android 5.0(LOLLIPOP) 버젼이상일 경우
