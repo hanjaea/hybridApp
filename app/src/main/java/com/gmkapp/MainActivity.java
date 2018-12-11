@@ -8,14 +8,23 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
+import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -29,6 +38,7 @@ import android.webkit.WebView;
 import android.widget.Toast;
 import android.app.DownloadManager;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -83,6 +93,14 @@ public class MainActivity extends AppCompatActivity {
     private WebSettings webSettings;
     private Map<String, String> mHeader = new HashMap<String, String>();
     private boolean goUrl = false;
+
+    public Uri mImageCaptureUri = null;
+    public String elementId = null;
+    public final int PICK_FROM_GALLERY = 50001;
+    public final int PICK_FROM_CAMERA = 50002;
+    public final int CROP_FROM_CAMERA = 50003;
+
+    public String callBase64ImageString = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -168,6 +186,8 @@ public class MainActivity extends AppCompatActivity {
         String AUTO_LOGIN_TOKEN = CPreferences.getPreferences(context,"AUTO_LOGIN_TOKEN");
         mResume = true;
         // 푸시를 통해 들어온 경우 해당 url로 바로 진입 처리 하는 로직
+        webview.loadUrl("file:///android_asset/www/index.html",WebViewSetting.setHeader(context));
+        /*
         if (webview != null && goUrl) {
             if(CPreferences.getPreferences(context, "AUTO_LOGIN_TOKEN") != null && !CPreferences.getPreferences(context, "AUTO_LOGIN_TOKEN").isEmpty()){
                 webview.loadUrl(URL_DOMAIN + URLConstants.MAIN_URL, WebViewSetting.setHeader(context)); //메인페이지
@@ -175,6 +195,7 @@ public class MainActivity extends AppCompatActivity {
                 webview.loadUrl(URL_DOMAIN + URLConstants.LOGIN_URL, WebViewSetting.setHeader(context)); //로그인페이지
             }
         }
+        */
 
     }
 
@@ -405,7 +426,49 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    DialogInterface.OnClickListener cameraListener = new DialogInterface.OnClickListener()
+    {
+        @Override
+        public void onClick(DialogInterface dialog, int which)
+        {
+            dialog.dismiss();
+            Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+            String url = "tmp_" + String.valueOf(System.currentTimeMillis()) + ".jpg";
 
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                mImageCaptureUri = FileProvider.getUriForFile(context, "com.gmkapp.fileprovider", new File(Environment.getExternalStorageDirectory(), url));
+            }else{
+                mImageCaptureUri = Uri.fromFile(new File(Environment.getExternalStorageDirectory(), url));
+            }
+
+
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
+            startActivityForResult(intent, PICK_FROM_CAMERA);
+            dialog.dismiss();
+        }
+    };
+
+    DialogInterface.OnClickListener albumListener = new DialogInterface.OnClickListener()
+    {
+        @Override
+        public void onClick(DialogInterface dialog, int which)
+        {
+            dialog.dismiss();
+            Intent intent = new Intent(Intent.ACTION_PICK);
+            intent.setType(MediaStore.Images.Media.CONTENT_TYPE);
+            startActivityForResult(intent, PICK_FROM_GALLERY);
+            dialog.dismiss();
+        }
+    };
+
+    DialogInterface.OnClickListener cancelListener = new DialogInterface.OnClickListener()
+    {
+        @Override
+        public void onClick(DialogInterface dialog, int which)
+        {
+            dialog.dismiss();
+        }
+    };
 
     /**
      * 네이티브 to Javascript 통신 메소드
@@ -491,12 +554,12 @@ public class MainActivity extends AppCompatActivity {
     public  boolean isStoragePermissionGranted() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED) {
+                    == PackageManager.PERMISSION_GRANTED && checkSelfPermission(android.Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
                 mFlag = true;
                 PermissionSuccess();
                 return true;
             } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.CAMERA}, REQUEST_CODE);
                 mFlag = false;
                 return false;
             }
@@ -542,6 +605,32 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @JavascriptInterface
+        public void getCamera(final String retFunc) {
+            callBase64ImageString = "javascript:eval(\"var func = " + retFunc.replaceAll("\"","'") + "\");";
+            cameraPermissionCheck();
+        }
+
+        @JavascriptInterface
+        public void downloadVideo(final String url, final String ext) {
+            mMainactivity.istrue = "false";
+            DownloadManager mdDownloadManager = (DownloadManager) context
+                    .getSystemService(Context.DOWNLOAD_SERVICE);
+            DownloadManager.Request req = new DownloadManager.Request(
+                    Uri.parse(url));
+            File destinationFile = new File(
+                    Environment.getExternalStorageDirectory(),
+                    SystemUtil.getFileName(url, ext));
+            req.setDescription("파일 다운로드 중입니다..");
+            req.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED);
+            req.setDestinationUri(Uri.fromFile(destinationFile));
+            mdDownloadManager.enqueue(req);
+
+            registerReceiver(mOnComplete, new IntentFilter(
+                    DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+
+        }
+
+        @JavascriptInterface
         public void fileDownload(final String url, final String ext) {
             mMainactivity.istrue = "false";
             DownloadManager mdDownloadManager = (DownloadManager) context
@@ -563,6 +652,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    /*
+     카메라 기능 추가 건으로 기존 함수를 막고 아래 함수를 사용 한다. 해당 함수 역할을 확인 할 필요 있음 사제 하지 말 것
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == INPUT_FILE_REQUEST_CODE && resultCode == RESULT_OK) {
@@ -598,6 +689,7 @@ public class MainActivity extends AppCompatActivity {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
+    */
 
     private Uri getResultUri(Intent data) {
         Uri result = null;
@@ -617,6 +709,178 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return result;
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        super.onActivityResult(requestCode, resultCode, data);
+
+
+        if (resultCode != RESULT_OK)
+
+            return;
+
+
+        switch (requestCode) {
+
+            case PICK_FROM_GALLERY:
+            {
+
+                mImageCaptureUri = data.getData();
+
+                Intent intent = new Intent("com.android.camera.action.CROP");
+                intent.setDataAndType(mImageCaptureUri, "image/*");
+
+                intent.putExtra("outputX", 320);
+                intent.putExtra("outputY", 320);
+                intent.putExtra("aspectX", 1);
+                intent.putExtra("aspectY", 1);
+                intent.putExtra("scale", true);
+                intent.putExtra("crop", "true");
+                intent.putExtra("return-data", true);
+                startActivityForResult(intent, CROP_FROM_CAMERA);
+
+                break;
+            }
+            case PICK_FROM_CAMERA: {
+
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    this.grantUriPermission("com.android.camera", mImageCaptureUri,
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+
+                Intent intent = new Intent("com.android.camera.action.CROP");
+                intent.setDataAndType(mImageCaptureUri, "image/*");
+
+                //List<ResolveInfo> list = getPackageManager().queryIntentActivities(intent, 0);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    grantUriPermission("com.android.camera.action.CROP", mImageCaptureUri,
+                            Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                }
+
+                Toast.makeText(this, "용량이 큰 사진의 경우 시간이 오래 걸릴 수 있습니다.", Toast.LENGTH_SHORT).show();
+
+                intent.putExtra("outputX", 320);
+                intent.putExtra("outputY", 320);
+                intent.putExtra("crop", "true");
+                intent.putExtra("aspectX", 1);
+                intent.putExtra("aspectY", 1);
+                intent.putExtra("scale", true);
+
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                    intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+                }
+
+                intent.putExtra("return-data", true);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, mImageCaptureUri);
+                intent.putExtra("outputFormat", Bitmap.CompressFormat.JPEG.toString());
+
+                Intent i = new Intent(intent);
+
+
+                startActivityForResult(i, CROP_FROM_CAMERA);
+
+
+
+                break;
+
+            }
+
+
+            case CROP_FROM_CAMERA:
+            {
+
+                final Bundle extras = data.getExtras();
+                Bitmap photo = null;
+                if(extras != null)
+                {
+                    photo = extras.getParcelable("data");
+                }else{
+                    Bitmap bitmap = null;
+                    try {
+                        bitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), mImageCaptureUri);
+
+
+                        photo = getCroppedBitmap(bitmap);
+
+
+
+
+                    } catch(Exception e){
+                        e.printStackTrace();
+                    }
+                }
+                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                photo.compress(Bitmap.CompressFormat.JPEG, 100, byteArrayOutputStream);
+                byte[] byteArray = byteArrayOutputStream .toByteArray();
+                String base64image = "data:image/jpeg;base64," + Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+
+
+                webview.loadUrl(callBase64ImageString + "func('"+base64image+"');");
+
+
+
+                File file = new File(mImageCaptureUri.getPath());
+                if (file.exists()) {
+                    file.delete();
+                }
+
+
+            }
+
+        }
+    }
+    public Bitmap getCroppedBitmap(Bitmap bitmap) {
+        Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
+                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+
+        final int color = 0xff424242;
+        final Paint paint = new Paint();
+        final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+
+        paint.setAntiAlias(true);
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        // canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+//        canvas.drawCircle(bitmap.getWidth() / 2, bitmap.getHeight() / 2,
+//                bitmap.getWidth() / 2, paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+        //Bitmap _bmp = Bitmap.createScaledBitmap(output, 60, 60, false);
+        //return _bmp;
+        return output;
+    }
+
+    public void chooseImage(){
+        new AlertDialog.Builder(this)
+                .setTitle("선택")
+                .setPositiveButton("카메라", cameraListener)
+                .setNeutralButton("갤러리", albumListener)
+                .setNegativeButton("취소", cancelListener)
+                .show();
+    }
+
+    public void cameraPermissionCheck(){
+
+        if ((ContextCompat.checkSelfPermission(this, android.Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)
+                || (ContextCompat.checkSelfPermission(this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                || (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED)
+                ) {
+
+            ActivityCompat.requestPermissions(this, new String[]{
+                    android.Manifest.permission.CAMERA,android.Manifest.permission.READ_EXTERNAL_STORAGE,android.Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_CODE);
+        }else{
+
+            chooseImage();
+
+        }
+
     }
 
 }

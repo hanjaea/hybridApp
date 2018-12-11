@@ -35,11 +35,11 @@ dependencies {
     implementation 'com.android.support:support-v4:27.1.0'
     implementation 'com.android.support:support-compat:27.1.0'
     implementation 'com.google.firebase:firebase-messaging:12.0.1'
-    //implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
+    implementation 'com.firebase:firebase-jobdispatcher:0.8.5'
     implementation 'com.googlecode.android-query:android-query:0.25.9'
     // Testing dependencies
-    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1', {
-        exclude group: 'com.android.support', module: 'support-annotations'
+    androidTestImplementation('com.android.support.test.espresso:espresso-core:3.0.1',{
+        exclude group:'com.android.support', module:'support-annotations'
     })
     //androidTestImplementation 'com.android.support.test:runner:1.0.1'
     //androidTestImplementation 'com.android.support:support-annotations:27.1.0'

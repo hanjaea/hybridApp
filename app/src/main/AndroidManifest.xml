@@ -9,6 +9,20 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.camera.front"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.any"
+        android:required="true" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />>
 
     <application
         android:allowBackup="false"
@@ -42,9 +56,50 @@
 
         <receiver android:name=".receiver.DownloadReceiver">
             <intent-filter>
-                <action android:name="kr.co.hybridApp.SEND_BROAD_CAST"/>
+                <action android:name="com.gmkapp.SEND_BROAD_CAST"/>
             </intent-filter>
         </receiver>
+
+        <!-- 카메라 관련 이미지 저장소 경로 -->
+        <provider
+            android:name="android.support.v4.content.FileProvider"
+            android:authorities="com.gmkapp.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/paths" />
+        </provider>
+
+        <!-- firebase를 이용한 푸시서비스 이용시 상위 버젼의 경우 channel id 정의 meta-data -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id" />
+        <!-- firebase 푸시 토큰이 들어오는 class -->
+        <service android:name=".push.MyFirebaseInstanceIDService">
+            <intent-filter>
+                <action android:name="com.google.firebase.INSTANCE_ID_EVENT" />
+            </intent-filter>
+        </service>
+        <!-- firebase 푸시 토큰을 통해 요청이 들어오면 해당 서비스를 통해 notification 을 호출 한다 -->
+        <service android:name=".push.MyFirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
+        <!-- [END firebase_iid_service] -->
+        <service
+            android:name=".push.MyJobService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />
+            </intent-filter>
+        </service>
+        <!-- firebase 푸시가 들어올 경우 아이콘을 설정 해 주는 meta-data -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/push" />
+
 
     </application>
 

@@ -158,6 +158,7 @@ var interface = {
     /**
      * URL을 통한 동영상 다운로드
      */
+
     ,downloadVideo: function(url,func){
 
         var message = {
@@ -175,6 +176,29 @@ var interface = {
 
         }else if(hUserAgent.indexOf("IosApp") != -1){
             window.webkit.messageHandlers.IosApp.postMessage(message);
+        }
+
+    }
+
+    ,fileDownload: function(url,ext){
+        alert('url:'+url+' ext:'+ext + hUserAgent.indexOf("AppDroid"));
+
+        var message = {
+            "callname":"fileDownload",
+            //"url":_hostName + url,
+            "url":url,
+            "ext":ext
+        };
+
+        if(hUserAgent.indexOf("AppDroid") != -1){
+
+            window.AppDroid.fileDownload(url,ext);
+            //window.AppDroid.downloadVideo(url);
+
+        }else if(hUserAgent.indexOf("IosApp") != -1){
+
+            window.webkit.messageHandlers.IosApp.postMessage(message);
+
         }
 
     }

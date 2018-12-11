@@ -50,19 +50,24 @@
     function callAnotherView(url){
         interface.callAnotherView(url);
     }
-    /*
+
     function getCamera(){
         interface.getCamera(function(value){
             document.getElementById('result').innerHTML = value;
 	    });
     }
-    */
+
 
     function downloadVideo(url){
             interface.downloadVideo(url,function(value){
                                     document.getElementById('result').innerHTML = value;
                                     });
            //location.href= url
+     }
+
+     function fileDownload(url, ext){
+        alert(url + ext);
+            interface.fileDownload(url, ext);
      }
 
     function link(url){
@@ -89,12 +94,12 @@
     <p><label>버전 호출: <input type="button" value="버전" onclick="javascript:getAppVersion();"/></label></p>
     <p><label>모델 호출: <input type="button" value="버전" onclick="javascript:getAppModel();"/></label></p>
     <p><label>토큰 호출: <input type="button" value="getTokenId" onclick="javascript:getTokenId();"/></label></p>
-    <!--<p><label>카메라 호출: <input type="button" value="getCamera" onclick="javascript:getCamera();"/></label></p>-->
+    <p><label>카메라 호출: <input type="button" value="getCamera" onclick="javascript:getCamera();"/></label></p>
     <p><label>외부브라우져링크:<input type="button" value="callOutBrowser" onclick="javascript:callOutBrowser('https://m.naver.com');" /></label></p>
     <!--<p><label>DatePicker: <input type="date" id="datepicker"/></label></p>-->
     <p><label>Detail: <input type="button" value="상세화면이동" id="detail" onclick="javascript:callAnotherView('https://m.daum.net/');"/></label></p>
-    <p><label>동영상 다운로드:<input type="button" value="downloadVideo"
-                              onclick="javascript:downloadVideo('https://www.sample-videos.com/video/mp4/720/big_buck_bunny_720p_20mb.mp4');" /></label></p>
+    <p><label>파일 다운로드:<input type="button" value="fileDownload"
+                              onclick="javascript:fileDownload('https://www.sample-videos.com/video123/mp4/720/big_buck_bunny_720p_1mb.mp4','mp4');" /></label></p>
 
 </fieldset>
 
